@@ -144,7 +144,6 @@ echo "Total: ${total_lines}"  # Total: 2
 ```
 
 
-
 ## Maths
 There is very seldom I write any complex arithmetic in Bash, usually I only do
 counters like this.
@@ -179,6 +178,18 @@ fi
 ```
 
 
+## Files
+When checking for files there actually exist quite a lot of options you can
+specify beyond the common "file exists" check ([source][12]), but this will
+probably be enought in most cases. 
+
+```bash
+if [ -f "${VAR}" ]; then
+    echo "The file '${VAR}' exists."
+fi
+```
+
+
 
 
 
@@ -193,3 +204,4 @@ fi
 [9]: https://wiki.bash-hackers.org/syntax/arith_expr
 [10]: https://www.golinuxcloud.com/bash-compare-numbers/
 [11]: https://linuxhint.com/bash_loop_list_strings/
+[12]: https://tldp.org/LDP/abs/html/fto.html
