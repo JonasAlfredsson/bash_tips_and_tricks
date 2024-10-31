@@ -95,6 +95,86 @@ if [ -n "${VAR-unset}" ]; then
 fi
 ```
 
+## Strings
+String manipulation is a bit of continuation of the Variables section above,
+but is different enough that it gets its own [section][15].
+
+### Casing
+[Normalize casing][16] might sometimes be necessary to simplify comparisons.
+
+```bash
+string="to uppercase"
+echo "${string^}"  # To uppercase
+echo "${string^^}" # TO UPPERCASE
+```
+
+```bash
+string="TO LOWERCASE"
+echo "${string,}"  # tO LOWERCASE
+echo "${string,,}" # to lowercase
+```
+
+### Equality
+Simple check to see if the strings are equal.
+
+```bash
+if [[ "${s1}" == "${s2}" ]]; then
+    echo "Equal"
+fi
+```
+
+### Substring Checking
+Here we look for a substring in a longer sentence.
+
+```bash
+full_sentence="This is a long sentence"
+part="is a long"
+```
+
+```bash
+if [[ "${full_sentence}" == *"${part}"* ]]; then
+    echo "Substring found!"
+fi
+```
+
+```bash
+# The "-i" makes grep case insensitive.
+if echo "${full_sentence}" | grep -i -q "${part}"; then
+    echo "Substring found!"
+fi
+```
+
+### Regex Matching
+A more powerful search with the help of regex.
+
+```bash
+if [[ "${sentence}" =~ ^(one|two) ]]; then
+   echo "Sentence starts with either 'one' or 'two'."
+fi
+```
+
+```bash
+if echo "${sentence}" | grep -E -q '^(one|two)'; then
+    echo "Sentence starts with either 'one' or 'two'."
+fi
+```
+
+### Multiline Concatenation
+Instead of storing a lot of data in temporary files it is possible to work with
+multiline variables in memory instead.
+
+```bash
+multiline_variable="This is a
+multiline variable
+where we will
+"
+multiline_variable+="add another line not ending in newline"
+multiline_variable+=$'\n' # Add missing newline.
+multiline_variable+="$(cat "${filepath}")" # Append a file.
+
+echo "${multiline_variable}" > "/path/to/outfile.txt"
+```
+
 
 ## Loops
 Loops are very common, so let's start with some very basic ones.
@@ -243,3 +323,5 @@ done < <(inotifywait -m -e moved_to --excludei '^.*?\.tmp$' "~/Downloads")
 [12]: https://tldp.org/LDP/abs/html/fto.html
 [13]: https://linux.die.net/man/1/inotifywait
 [14]: https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
+[15]: https://linuxize.com/post/how-to-compare-strings-in-bash/
+[16]: https://medium.com/mkdir-awesome/case-transformation-in-bash-and-posix-with-examples-acdc1e0d0bc4
