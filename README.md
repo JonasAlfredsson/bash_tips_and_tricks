@@ -102,25 +102,6 @@ for val in ${StringArray[@]}; do
 done
 ```
 
-### Files in Directory
-One thing I have done is trying to iterate over all `*.conf` files in a
-directory. This can be done by either of these two loops, where the `while`
-one is a better alternative as it handles filenames with spaces in them
-([source][4], [source][5]).
-
-```bash
-for file in /directory/path/*.conf; do
-    echo "${file}"
-done
-
-while IFS= read -r -d $'\0' file; do
-    echo "${file}"
-done < <(find /directory/path/ -name "*.conf" -maxdepth 1 -type f -print0)
-```
-
-> NOTE: The `while` loop does not use a subshell here so all variables in
-> the current scope are mutable ([see next section](#while-loop-and-subshells)).
-
 ### `while` Loop and Subshells
 
 The `while` loops are a little bit tricky since they usually execute in a
@@ -181,13 +162,51 @@ fi
 ## Files
 When checking for files there actually exist quite a lot of options you can
 specify beyond the common "file exists" check ([source][12]), but this will
-probably be enought in most cases. 
+probably be enough in most cases.
 
 ```bash
 if [ -f "${VAR}" ]; then
     echo "The file '${VAR}' exists."
 fi
 ```
+
+### Files in Directory
+One thing I have done is trying to iterate over all `*.conf` files in a
+directory. This can be done by either of these two loops, where the `while`
+one is a better alternative as it handles filenames with spaces in them
+([source][4], [source][5]) and is iterated in alphabetical order.
+
+```bash
+for file in /directory/path/*.conf; do
+    echo "${file}"
+done
+
+while IFS= read -r -d $'\0' file; do
+    echo "${file}"
+done < <(find /directory/path/ -maxdepth 1 -name "*.conf" -type f -print0 | sort -z)
+```
+
+> NOTE: The `while` loop does not use a subshell here so all variables in
+> the current scope are mutable ([see previous section](#while-loop-and-subshells)).
+
+### Listening to `inotify` Events
+Instead of polling a folder to check for changes, it is possible to utilize the
+Linux kernel's inotify feature to react to events as they happen. In the
+following example we will wait for a "MOVE_TO" operation to happen in the
+Downloads folder, but we are not interested in "*.tmp" files. This could be
+useful for waiting for a browser to completing its download (to a temporary
+file) and then acting upon the file when it is moved/renamed to its final
+name after completion.
+
+> This requires the [`inotify-tools`][13] package to be installed.
+
+```bash
+while read -r directory action file; do
+    echo "Event in ${directory}: ${action} ${file}"
+    # Event in /home/username/Downloads: MOVED_TO file.txt
+done < <(inotifywait -m -e moved_to --excludei '^.*?\.tmp$' "~/Downloads")
+```
+
 
 
 
@@ -205,3 +224,4 @@ fi
 [10]: https://www.golinuxcloud.com/bash-compare-numbers/
 [11]: https://linuxhint.com/bash_loop_list_strings/
 [12]: https://tldp.org/LDP/abs/html/fto.html
+[13]: https://linux.die.net/man/1/inotifywait
