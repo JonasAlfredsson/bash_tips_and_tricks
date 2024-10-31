@@ -10,6 +10,23 @@ I think I will keep everything in a single document so it will be easier to
 `Ctrl+F` stuff.
 
 
+## Settings
+Bash scripts has a few [settings][14] which might be of interest to include at
+the top like this:
+
+```bash
+#!/bin/bash
+set -eou pipefail
+```
+
+- `#!/bin/bash`: A "shebang" - Allows the OS to know that Bash should be used
+                 when executing a file directly like `./script.sh`.
+- `set -e`: Have the script exit if any command fails.
+- `set -u`: Have the script fail if any variable is unset.
+- `set -o`: Provide extra options, in this case "pipefail" -> Have the script
+            exit if any command in a pipe fails.
+
+
 ## Variables
 
 Variables is something you always have to work with and you often have to
@@ -225,3 +242,4 @@ done < <(inotifywait -m -e moved_to --excludei '^.*?\.tmp$' "~/Downloads")
 [11]: https://linuxhint.com/bash_loop_list_strings/
 [12]: https://tldp.org/LDP/abs/html/fto.html
 [13]: https://linux.die.net/man/1/inotifywait
+[14]: https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
